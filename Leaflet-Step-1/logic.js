@@ -1,7 +1,7 @@
 // Create a map object
 var myMap = L.map("map", {
     center: [34.0522, -118.2437],
-    zoom: 6
+    zoom: 5
   });
   
   L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
@@ -10,8 +10,7 @@ var myMap = L.map("map", {
     id: "mapbox.streets-basic",
     accessToken: API_KEY
   }).addTo(myMap);
-
-
+  
 url =  "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson";
 
 
@@ -23,38 +22,47 @@ d3.json(url, function(data) {
     var longitude = data.features[i].geometry.coordinates[0];
     var location = [latitude, longitude];
     var magnitude = data.features[i].properties.mag;
-
-    // Conditionals for earthquake magnitude
-      var color = "";
-      if (magnitude >= 5) {
-        color = "#581845";
-      }
-      else if (magnitude >= 4) {
-        color = "#900C3F";
-      }
-      else if (magnitude >= 3) {
-        color = "#C70039";
-      }
-      else if (magnitude >= 2) {
-        color = "#FF5733";
-      }
-      else if (magnitude >= 1) {
-        color = "#FFC300";
-      }
-      else {
-        color = "#DAF7A6";
-      }  
+      
+  function getColor(d) {
+    return d > 5 ? '#bd0026' :
+            d > 4 ? '#f03b20' :
+            d > 3 ? '#fd8d3c' :
+            d > 2 ? '#feb24c' :
+            d > 1 ? '#fed976' :
+                    '#ffffb2';
+  }
     
-    L.circle(location, {
-      fillOpacity: 1,
-      color: color,
-      fillColor: color,
-      weight: 1,
-      opacity: 2,
-      radius: magnitude * 20000
-      }).bindPopup("<h3>" + data.features[i].properties.place + "</h3> <hr> <h4>Mag: " + magnitude + "</h4>").addTo(myMap);
-       
-    }
+  L.circle(location, {
+    fillOpacity: 1,
+    color: 'black',
+    fillColor: getColor(magnitude),
+    weight: 1,
+    opacity: 2,
+    radius: (magnitude*20000)
+    }).bindPopup("<h3>" + data.features[i].properties.place + "</h3> <hr> <h4>Mag: " + magnitude + "</h4>").addTo(myMap);
+      
+  }
 
 });
+
+//Add legend
+// var legend = L.control({position: 'bottomright'});
+
+// legend.onAdd = function (map) {
+
+// 	var div = L.DomUtil.create('div', 'info legend'),
+// 		grades = [0, 1, 2, 3, 4, 5],
+// 		labels = [];
+
+// 	for (var i = 0; i < grades.length; i++) {
+// 		div.innerHTML +=
+// 			'<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
+// 			grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+// 	}
+
+// 	return div;
+// };
+
+// legend.addTo(myMap);
+
 
